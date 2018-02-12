@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Celebrity Data Demo - Entertainment Express API</title>
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous" />
+  <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4=" crossorigin="anonymous"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+
+  <link rel="stylesheet" href="https://apimgmtstxlc8h1f6y8xtzhf.blob.core.windows.net/content/MediaLibrary/demos/js/easy-autocomplete.min.css" />
+  <script src="https://apimgmtstxlc8h1f6y8xtzhf.blob.core.windows.net/content/MediaLibrary/demos/js/jquery.easy-autocomplete.min.js"></script>
+  <script src="https://kendo.cdn.telerik.com/2017.3.913/js/kendo.all.min.js"></script>
+  <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2016.3.914/styles/kendo.common-bootstrap.min.css" integrity="sha384-vFErptp0vrPoSTrPXnHdPHJsNHlN9Qxotj/FvCu6PW9HoG8pErYBmWPD0F46PR7Y" crossorigin="anonymous" />
+  <link rel="stylesheet" href="https://kendo.cdn.telerik.com/2016.3.914/styles/kendo.bootstrap.min.css" integrity="sha384-ZjYfNbPQkyfcKSO4DvxIn+cBeUxXdIg3oI69IPu+oDaKzpGBwXTzHAj+a8CMb3En" crossorigin="anonymous" />
+
+  <style>
+    #results {
+      padding: 20px;
+    }
+
+    .TitleHeading {
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    .playContainer {
+      position: relative;
+      top: 0;
+      left: 0;
+    }
+
+    .playImage {
+      position: relative;
+      top: 0px;
+      left: 0px;
+      cursor: pointer;
+    }
+
+    .playbutton {
+      position: absolute;
+      top: 5px;
+      left: 5px;
+      color: white;
+      font-size: 30px;
+      z-index: 5000;
+      cursor: pointer;
+    }
+
+    #WindowDetails {
+      padding: 2px;
+      width: 100%;
+      max-height: 600px;
+      overflow-y: scroll;
+    }
+
+    #WindowImage {
+      width: 100%;
+      height: auto;
+      position: relative;
+    }
+
+    #highlighted-point {
+      width: 2px;
+      height: 2px;
+      border: solid 2px lightgreen;
+      z-index: 999999;
+      border-radius: 2px;
+      position: absolute;
+      padding: 0px;
+    }
+  </style>
+
+</head>
+
+<body>
+  <div class="container">
+
+    <div class="page-header">
+
+      <h1>Internet Video Archive Celebrity Data Demo</h1>
+      <p>To use the demo below you must provide a subscription key. Subscription keys can be found in your <a href="/developer">profile</a>. Don’t have a subscription key? <a href="/signup">Sign up</a> for free! Add a <a href="https://developer.iva-api.com/products/599eeddbffde2b0d7cf79a9a/subscribe">EE Demo</a>        subscription to your account to get a key and get started.</p>
+      <div>Entertainment subscription-key: (8c0b42b3cdbe46d683cb9279a47e6bdc) <input type="text" id="iva-subscription-key" style="width:300px" value="" onchange="checkVisibility()" /><input type="button" value="Enable" onclick="checkVisibility()" />
+      </div>
+
+    </div>
+
+
+
+    <div class="row demosection" style="padding:20px;">
+      <div style="width:100%;">Person Search (demo limited to actors/actresses in movies with theatrical revenue ~ about 280,000): <input type="text" style="width: 100%;" placeholder="Type a celebrity name" id="personSearch" /></div>
+    </div>
+    <div class="row demosection">
+      <div id="results">
+
+        <div id="Person">
+          <div class="panel panel-default">
+            <div class="panel-heading"><span class="TitleHeading" data-bind="text: Name"></span></div>
+            <div class="panel-body">
+              <table class="table table-bordered table-sm table-striped table-responsive" role="grid">
+                <tbody>
+
+                  <tr>
+                    <td>Id:</td>
+                    <td data-bind="text: Id"></td>
+                  </tr>
+                  <tr>
+                    <td>Modified</td>
+                    <td data-format="dd-MM-yyyy" data-bind="text: Modified"></td>
+                  </tr>
+
+                  <tr>
+                    <td>Gender</td>
+                    <td data-bind="text: Gender"></td>
+                  </tr>
+                  <tr>
+                    <td>Birth Date</td>
+                    <td data-bind="text: BirthDate.Date"></td>
+                  </tr>
+                  <tr>
+                    <td>Death Date</td>
+                    <td data-bind="text: DeathDate.Date"></td>
+                  </tr>
+                  <tr>
+                    <td>Birth Name</td>
+                    <td data-bind="text: BirthName"></td>
+                  </tr>
+                  <tr>
+                    <td>Alternate Names</td>
+                    <td>
+                      <ul data-template="ul-template" data-bind="source: AlternateNames" style="margin:0px; list-style-type: none; padding: 0px;"></ul>
+                      <script id="ul-template" type="text/x-kendo-template">
+                        <li style="margin:0px; padding: 0px;">
+                          <span data-bind="text: name"></span>
+                        </li>
+                      </script>
+
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>External Ids</td>
+                    <td>
+                      <ul data-template="ul-template-externalids" data-bind="source: ExternalIds" style="margin:0px; list-style-type: none; padding: 0px;"></ul>
+                      <script id="ul-template-externalids" type="text/x-kendo-template">
+                        <li style="margin:0px; padding: 0px;">
+                          Type: <span data-bind="text: Type"></span> &nbsp; ID: <span data-bind="text: AlternateId"></span>
+
+                        </li>
+                      </script>
+
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel panel-default">
+          <div class="panel-heading">Images</div>
+          <div class="panel-body">
+            <div id="Images"></div>
+            <script type="text/x-kendo-template" id="Images_detail_template">
+              <div>
+                <table class="table">
+                  <thead>
+                    <tr>
+                      <th>ID</th>
+                      <th>Width</th>
+                      <th>Height</th>
+                      <th>Aspect</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>#= Id #</td>
+                      <td>#= Width #</td>
+                      <td>#= Height #</td>
+                      <td>#= templateImageAspect({ Width: Width, Height: Height }) #</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </script>
+
+          </div>
+        </div>
+
+
+
+        <div class="panel panel-default">
+          <div class="panel-heading">Filmography - Movies</div>
+          <div class="panel-body">
+            <div id="Movies"></div>
+          </div>
+        </div>
+
+        <div class="panel panel-default">
+          <div class="panel-heading">Filmography - TV Shows</div>
+          <div class="panel-body">
+
+            <div id="Shows"></div>
+
+          </div>
+        </div>
+
+
+        <div class="panel panel-default">
+          <div class="panel-heading">Filmography - TV Episodes</div>
+          <div class="panel-body">
+
+            <div id="Episodes"></div>
+          </div>
+        </div>
+
+        <div class="panel panel-default">
+          <div class="panel-heading">Biographies</div>
+          <div class="panel-body">
+            <div id="Descriptions"></div>
+          </div>
+        </div>
+
+        <div class="panel panel-default">
+          <div class="panel-heading">Tags</div>
+          <div class="panel-body">
+            <div id="Tags"></div>
+          </div>
+        </div>
+
+
+
+      </div>
+    </div>
+
+
+
+
+
+
+
+  </div>
+  <!-- /container -->
+
+
+  <script>
+    var baseUrl = "https://ee.iva-api.com";
+    var imagesData;
+    var PersonData;
+    // Make all of the data sources available for filtering
+    var ImagesDs;
+    var MoviesDs;
+    var ShowsDs;
+    var EpisodesDs;
+    var DescriptionsDs;
+    var TagsDs;
+
+    // hide the demo
+    $(".demosection").hide();
+    console.log("apiKey = " + getApiKey());
+    var PersonId = qs("Id");
+    if (PersonId) {
+      DisplayPersonData(PersonId);
+    }
+
+    function qs(key) {
+      key = key.replace(/[*+?^$.\[\]{}()|\\\/]/g, "\\$&"); // escape RegEx meta chars
+      var match = location.search.match(new RegExp("[?&]" + key + "=([^&]+)(&|$)"));
+      return match && decodeURIComponent(match[1].replace(/\+/g, " "));
+    }
+    // Setup the autocomplete plugin.
+    var options = {
+      url: function(phrase) {
+        if (phrase !== "") {
+          return baseUrl + "/People/RankedSearch?StartsWith=" + phrase + "&subscription-Key=" + getApiKey();
+        }
+      },
+      getValue: function(element) {
+        console.log("ID = " + element.Id.toString());
+        return element.Id.toString();
+      },
+      ajaxSettings: {
+        dataType: "json"
+      },
+      requestDelay: 300,
+      theme: "round",
+      template: {
+        type: "custom",
+        method: function(value, item) {
+          value = item.Id.toString();
+          return item.Name;
+        }
+      },
+      list: {
+        onChooseEvent: function() {
+          var value = $("#personSearch").getSelectedItemData().Id;
+          console.log(value);
+          DisplayPersonData(value);
+        }
+      }
+    };
+    $("#personSearch").easyAutocomplete(options);
+    // get data and display it
+    function DisplayPersonData(id) {
+      // reset the imagesData when a new title is selected.
+      imagesData = null;
+      var getPerson = $.getJSON(baseUrl + "/People/" + id + "?subscription-key=" + getApiKey(), {
+        "Includes": "AlternateNames,ExternalIds,Images,Descriptions,Tags"
+      });
+      var getFilmography = $.getJSON(baseUrl + "/People/" + id + "/Filmography?subscription-key=" + getApiKey());
+      $.when(getPerson).done(function(personData) {
+        if (getPerson.length == 0) {
+          $("#results").append("<div class=\"text-center\">No people matched for ID: " + id + ".</div>");
+          return;
+        } else {
+          PersonData = personData;
+          ImagesDs = new kendo.data.DataSource({
+            data: personData.Images,
+            pageSize: 5
+          });
+          var ImagesGrid = $('#Images').data("kendoGrid");
+          ImagesGrid.setDataSource(ImagesDs);
+          DescriptionsDs = new kendo.data.DataSource({
+            data: personData.Descriptions,
+            pageSize: 5
+          });
+          var DescriptionsGrid = $('#Descriptions').data("kendoGrid");
+          DescriptionsGrid.setDataSource(DescriptionsDs);
+          TagsDs = new kendo.data.DataSource({
+            data: personData.Tags,
+            pageSize: 5
+          });
+          var TagsGrid = $('#Tags').data("kendoGrid");
+          TagsGrid.setDataSource(TagsDs);
+          // Bind the Person Properties to the Person section.
+          kendo.bind($("#Person"), personData);
+          // get all of the filepaths from Images to request URLs in a single batch request.
+          var filePath = personData.Images.map(function(a) {
+            return a.FilePath;
+          });
+          var getImages = $.post(baseUrl + "/Images/Batch?format=json&subscription-key=" + getApiKey(), {
+            "FilePath": filePath.join()
+          }, "json");
+          $.when(getImages).done(function(data) {
+            // Save the images data for use when the grid is bound to Images Data.
+            if (imagesData) {
+              imagesData = imagesData.concat(data);
+            } else {
+              imagesData = data;
+            }
+            UpdateImageUrl();
+          });
+        }
+      });
+      $.when(getFilmography).done(function(filmographyData) {
+        if (getFilmography.length == 0) {
+          return;
+        } else {
+          MoviesDs = new kendo.data.DataSource({
+            data: filmographyData.Movies,
+            pageSize: 5
+          });
+          var MoviesGrid = $('#Movies').data("kendoGrid");
+          MoviesGrid.setDataSource(MoviesDs);
+          ShowsDs = new kendo.data.DataSource({
+            data: filmographyData.Shows,
+            pageSize: 5
+          });
+          var ShowsGrid = $('#Shows').data("kendoGrid");
+          ShowsGrid.setDataSource(ShowsDs);
+          EpisodesDs = new kendo.data.DataSource({
+            data: filmographyData.Episodes,
+            pageSize: 5
+          });
+          var EpisodesGrid = $('#Episodes').data("kendoGrid");
+          EpisodesGrid.setDataSource(EpisodesDs);
+        }
+      });
+    }
+
+    $(document).ready(function() {
+      var myWindow = $("#window");
+      myWindow.kendoWindow({
+        width: "80%",
+        height: "640px",
+        title: "Image Details",
+        visible: false,
+        actions: [
+          "Close"
+        ],
+        close: onWindowClose
+      });
+      $("#Images").kendoGrid({
+        sortable: true,
+        groupable: false,
+        scrollable: true,
+        filterable: true,
+        filterMenuInit: function(e) {
+          var grid = e.sender;
+          e.container.data("kendoPopup").bind("open", function() {
+            ImagesDs.sort({
+              field: e.field,
+              dir: "asc"
+            });
+            var uniqueDsResult = removeDuplicates(grid.dataSource.view(), e.field);
+          })
+        },
+        pageable: {
+          pageSize: 5,
+          buttonCount: 2,
+          pageSizes: [1, 5, 10, 'All']
+        },
+        dataBound: onImageDataBound,
+        columns: [{
+            field: "url",
+            width: "200px",
+            template: templateImagePreview,
+            filterable: false
+          },
+          {
+            field: "ImageType",
+            title: "Type",
+            width: "100px",
+            filterable: {
+              multi: true,
+              dataSource: ImagesDs
+            }
+          },
+          {
+            field: "Width",
+            title: "W",
+            width: "60px",
+            filterable: {
+              multi: true,
+              dataSource: ImagesDs
+            }
+          },
+          {
+            field: "Height",
+            title: "H",
+            width: "60px",
+            filterable: {
+              multi: true,
+              dataSource: ImagesDs
+            }
+          },
+          {
+            field: "Violence",
+            title: "Viol.",
+            width: "100px",
+            filterable: {
+              multi: true,
+              dataSource: ImagesDs
+            }
+          },
+          {
+            field: "Sexuality",
+            width: "100px",
+            title: "Sex",
+            filterable: {
+              multi: true,
+              dataSource: ImagesDs
+            }
+          },
+
+          {
+            field: "Official",
+            width: "100px",
+            title: "Primary",
+            filterable: {
+              multi: true,
+              dataSource: ImagesDs
+            }
+          },
+          {
+            field: "Id",
+            template: templateIdSection,
+            filterable: false
+          },
+
+
+        ],
+        change: function(e) {
+          ImagesDs.data(e.items);
+        },
+      });
+      $("#Descriptions").kendoGrid({
+        sortable: true,
+        groupable: false,
+        scrollable: true,
+        filterable: true,
+        filterMenuInit: function(e) {
+          var grid = e.sender;
+          e.container.data("kendoPopup").bind("open", function() {
+            DescriptionsDs.sort({
+              field: e.field,
+              dir: "asc"
+            });
+            var uniqueDsResult = removeDuplicates(grid.dataSource.view(), e.field);
+          })
+        },
+        pageable: {
+          pageSize: 5,
+          buttonCount: 2,
+          pageSizes: [1, 5, 10, 'All']
+        },
+      });
+      $("#Tags").kendoGrid({
+        sortable: true,
+        groupable: false,
+        scrollable: true,
+        filterable: true,
+        filterMenuInit: function(e) {
+          var grid = e.sender;
+          e.container.data("kendoPopup").bind("open", function() {
+            TagsDs.sort({
+              field: e.field,
+              dir: "asc"
+            });
+            var uniqueDsResult = removeDuplicates(grid.dataSource.view(), e.field);
+          })
+        },
+        pageable: {
+          pageSize: 5,
+          buttonCount: 2,
+          pageSizes: [1, 5, 10, 'All']
+        },
+      });
+      $("#Movies").kendoGrid({
+        sortable: true,
+        groupable: false,
+        scrollable: true,
+        filterable: true,
+        filterMenuInit: function(e) {
+          var grid = e.sender;
+          e.container.data("kendoPopup").bind("open", function() {
+            ImagesDs.sort({
+              field: e.field,
+              dir: "asc"
+            });
+            var uniqueDsResult = removeDuplicates(grid.dataSource.view(), e.field);
+          })
+        },
+        pageable: {
+          pageSize: 5,
+          buttonCount: 2,
+          pageSizes: [1, 5, 10, 'All']
+        },
+
+        columns: [{
+            field: "Id",
+            title: "Id",
+            width: "100px",
+            filterable: {
+              multi: true,
+              dataSource: MoviesDs
+            }
+          },
+          {
+            field: "OriginalTitle",
+            width: "120px",
+            filterable: false,
+            template: templateMovieLink
+          },
+          {
+            field: "Year",
+            width: "120px",
+            filterable: {
+              multi: true,
+              dataSource: MoviesDs
+            }
+          },
+          {
+            field: "Job",
+            width: "120px",
+            filterable: {
+              multi: true,
+              dataSource: MoviesDs
+            }
+          },
+          {
+            field: "Character",
+            width: "120px",
+            filterable: {
+              multi: true,
+              dataSource: MoviesDs
+            }
+          },
+        ],
+      });
+      $("#Shows").kendoGrid({
+        sortable: true,
+        groupable: false,
+        scrollable: true,
+        filterable: true,
+        filterMenuInit: function(e) {
+          var grid = e.sender;
+          e.container.data("kendoPopup").bind("open", function() {
+            ImagesDs.sort({
+              field: e.field,
+              dir: "asc"
+            });
+            var uniqueDsResult = removeDuplicates(grid.dataSource.view(), e.field);
+          })
+        },
+        pageable: {
+          pageSize: 5,
+          buttonCount: 2,
+          pageSizes: [1, 5, 10, 'All']
+        },
+        columns: [{
+            field: "Id",
+            title: "Id",
+            width: "100px",
+            filterable: {
+              multi: true,
+              dataSource: ShowsDs
+            }
+          },
+          {
+            field: "OriginalTitle",
+            width: "120px",
+            filterable: false,
+            template: templateSeriesLink
+
+          },
+          {
+            field: "Year",
+            width: "120px",
+            filterable: {
+              multi: true,
+              dataSource: ShowsDs
+            }
+          },
+          {
+            field: "Job",
+            width: "120px",
+            filterable: {
+              multi: true,
+              dataSource: ShowsDs
+            }
+          },
+          {
+            field: "Character",
+            width: "120px",
+            filterable: {
+              multi: true,
+              dataSource: ShowsDs
+            }
+          },
+        ],
+      });
+      $("#Episodes").kendoGrid({
+        sortable: true,
+        groupable: false,
+        scrollable: true,
+        filterable: true,
+        filterMenuInit: function(e) {
+          var grid = e.sender;
+          e.container.data("kendoPopup").bind("open", function() {
+            ImagesDs.sort({
+              field: e.field,
+              dir: "asc"
+            });
+            var uniqueDsResult = removeDuplicates(grid.dataSource.view(), e.field);
+          })
+        },
+        pageable: {
+          pageSize: 5,
+          buttonCount: 2,
+          pageSizes: [1, 5, 10, 'All']
+        },
+        columns: [{
+            field: "Id",
+            title: "Id",
+            width: "100px",
+            filterable: {
+              multi: true,
+              dataSource: EpisodesDs
+            }
+          },
+          {
+            field: "ShowId",
+            title: "ShowId",
+            width: "100px",
+            filterable: false,
+            template: templateShowLink
+          },
+          {
+            field: "OriginalTitle",
+            width: "120px",
+            filterable: false,
+            template: templateEpisodeLink
+          },
+          {
+            field: "Year",
+            width: "120px",
+            filterable: {
+              multi: true,
+              dataSource: EpisodesDs
+            }
+          },
+          {
+            field: "Job",
+            width: "120px",
+            filterable: {
+              multi: true,
+              dataSource: EpisodesDs
+            }
+          },
+          {
+            field: "Character",
+            width: "120px",
+            filterable: {
+              multi: true,
+              dataSource: EpisodesDs
+            }
+          },
+        ],
+      });
+    });
+
+    function onImageDataBound(arg) {
+      UpdateImageUrl();
+    }
+
+    function getApiKey() {
+      var key = $("#iva-subscription-key").val();
+      if (key) {
+        setCookie("subscription-key", key);
+        return key;
+      } else {
+        key = getCookie("subscription-key");
+        if (key) {
+          $("#iva-subscription-key").val(key);
+          checkVisibility();
+          return key;
+        }
+      }
+    }
+
+    function setCookie(key, value) {
+      var expires = new Date();
+      expires.setTime(expires.getTime() + 31536000000); //1 year
+      document.cookie = key + '=' + value + ';expires=' + expires.toUTCString();
+    }
+
+    function getCookie(key) {
+      var keyValue = document.cookie.match('(^|;) ?' + key + '=([^;]*)(;|$)');
+      return keyValue ? keyValue[2] : null;
+    }
+
+    function templateIdSection(args) {
+      var response = "<div>ImageId: " + args.Id + "</div>";
+      if (args.MovieId) {
+        response += "<div>MovieId: <a href=\"movie-data-demo?Id=" + args.MovieId + "\">" + args.MovieId + "</a></div>";
+      }
+      if (args.ShowId) {
+        response += "<div>ShowId: <a href=\"series-data-demo?Id=" + args.ShowId + "\">" + args.ShowId + "</a></div>";
+      }
+      if (args.SeasonId) {
+        response += "<div>SeasonId: " + args.SeasonId + "</div>";
+      }
+      if (args.EpisodeId) {
+        response += "<div>EpisodeId: <a href=\"episode-data-demo?Id=" + args.EpisodeId + "\">" + args.EpisodeId + "</a></div>";
+      }
+      return response;
+    }
+
+    function templateEpisodeLink(args) {
+      return "<a href=\"episode-data-demo?Id=" + args.Id + "\">" + args.OriginalTitle + "</a>";
+    }
+
+    function templateMovieLink(args) {
+      return "<div><a href=\"movie-data-demo?Id=" + args.Id + "\">" + args.OriginalTitle + "</a></div>";
+    }
+
+    function templateSeriesLink(args) {
+      return "<div><a href=\"series-data-demo?Id=" + args.Id + "\">" + args.OriginalTitle + "</a></div>";
+    }
+
+    function templateShowLink(args) {
+      return "<div><a href=\"series-data-demo?Id=" + args.ShowId + "\">" + args.ShowId + "</a></div>";
+    }
+
+    function templateImagePreview(args) {
+      var response = "";
+      var tags = [];
+      args.Tags.forEach(function(element) {
+        tags.push(element.Name);
+      });
+      if (args.FilePath && args.ImageType == "Photo") {
+        response += "<img data-filepath=\"" + args.FilePath + "\" style=\"max-width: 100%; cursor: pointer;\" onclick=\"openImageWindow(this," + args.Id + ");\" />";
+      } else if (args.FilePath && args.ImageType != "Photo") {
+        response += "<img data-filepath=\"" + args.FilePath + "\" style=\"max-width: 100%;\" />";
+      }
+      if (tags.length > 0) {
+        response += "<div>Tags: " + tags.join(", ") + "</div>";
+      }
+      return response;
+    }
+
+    function templateImageTags(args) {
+      var response = "";
+      var tags = [];
+      args.Tags.forEach(function(element) {
+        tags.push(element.Name);
+      });
+      response += "<div>" + tags.join(", ") + "</div>";
+      return response;
+    }
+
+    function openImageWindow(ele, imageId) {
+      // set the image in the window.
+      var myWindow = $("#window");
+      myWindow.kendoWindow({
+        width: "80%",
+        height: "80%",
+        title: "Image Details",
+        visible: false,
+        actions: [
+          "Close"
+        ],
+        close: onWindowClose
+      });
+      // set the image
+      $("#WindowImage").attr("src", ele.src);
+      // bind the image data to details section
+      var result = PersonData.Images.find(x => x.Id === imageId);
+      console.log(result);
+      kendo.bind($("#WindowDetails"), result);
+      myWindow.data("kendoWindow").center().open();
+    }
+
+    function onWindowClose() {
+      $("#WindowImage").attr("src", "");
+      // reset bindings
+      kendo.bind($("#WindowDetails"), null);
+      // reset any highlights
+      $("#highlighted-point").css("left", 0).css("top", 0);
+    }
+
+    function UpdateImageUrl() {
+      if (imagesData) {
+        $("[data-filepath]").each(function() {
+          var element = $(this);
+          var matched = imagesData.find(function(obj) {
+            if (element.data("filepath") == obj.FilePath) return obj.Url;
+          });
+          if (matched) {
+            element.attr("src", matched.Url);
+          }
+        });
+      }
+    }
+
+    function checkVisibility() {
+      if (getApiKey().length > 30) {
+        $(".demosection").show();
+        $(".easy-autocomplete").width("100%");
+      }
+    }
+
+    function ImageTypeFilter(element) {
+      element.kendoDropDownList({
+        dataSource: {
+          data: ["Photo", "Poster"]
+        },
+        optionLabel: "--Select Value--"
+      });
+    }
+
+    function removeDuplicates(items, field) {
+      var getter = function(item) {
+          return item[field]
+        },
+        result = [],
+        index = 0,
+        seen = {};
+      while (index < items.length) {
+        var item = items[index++],
+          text = getter(item);
+        if (text !== undefined && text !== null && !seen.hasOwnProperty(text)) {
+          result.push(item);
+          seen[text] = true;
+        }
+      }
+      return result;
+    }
+
+    function HighlightLandmark(left, top) {
+      var leftPercentage = (left * 100) + "%";
+      var topPercentage = (top * 100) + "%";
+      $("#highlighted-point").css("left", leftPercentage).css("top", topPercentage);
+    }
+
+    function GetProgramString(movieid, showid, episodeid) {
+      return "MovieId: 554433";
+    }
+  </script>
+
+
+  <script id="template-generic" type="text/x-kendo-template">
+    <table class="table table-bordered table-sm table-striped table-responsive" role="grid" style="padding:0px; margin-bottom:0px">
+      <tr>
+        <td><span data-bind="text: Value"></span> (<span data-bind="text: Confidence" data-format="n1"></span><span> confidence)</span></td>
+      </tr>
+    </table>
+  </script>
+
+  <script id="template-age-range" type="text/x-kendo-template">
+    <table class="table table-bordered table-sm table-striped table-responsive" role="grid" style="padding:0px; margin-bottom:0px">
+      <tr>
+        <td>High:</td>
+        <td data-bind="text: High"></td>
+      </tr>
+      <tr>
+        <td>Low:</td>
+        <td data-bind="text: Low"></td>
+      </tr>
+    </table>
+  </script>
+
+  <script id="template-emotions" type="text/x-kendo-template">
+    <tr>
+      <td data-bind="text: Type"></td>
+      <td data-bind="text: Confidence" data-format="n1"></td>
+    </tr>
+  </script>
+
+  <script id="template-landmarks" type="text/x-kendo-template">
+    <tr>
+      <td><a href="javascript:HighlightLandmark(#:X#,#:Y#)" data-bind="text:Type"></a></td>
+      <td data-bind="text: X"></td>
+      <td data-bind="text: Y"></td>
+    </tr>
+  </script>
+
+  <script id="template-boundingbox" type="text/x-kendo-template">
+    <table class="table table-bordered table-sm table-striped table-responsive" role="grid" style="padding:0px; margin-bottom:0px">
+      <tbody>
+        <tr>
+          <td>Height: <span data-bind="text: Height" data-format="p"></span></td>
+        </tr>
+        <tr>
+          <td>Width: <span data-bind="text: Width" data-format="p"></span></td>
+        </tr>
+        <tr>
+          <td>Top: <span data-bind="text: Top" data-format="p"></span></td>
+        </tr>
+        <tr>
+          <td>Left: <span data-bind="text: Left" data-format="p"></span></td>
+        </tr>
+      </tbody>
+    </table>
+  </script>
+
+  <script id="template-pose" type="text/x-kendo-template">
+    <table class="table table-bordered table-sm table-striped table-responsive" role="grid" style="padding:0px; margin-bottom:0px">
+      <tbody>
+        <tr>
+          <td>Pitch: <span data-bind="text: Pitch"></span></td>
+        </tr>
+        <tr>
+          <td>Roll: <span data-bind="text: Roll"></span></td>
+        </tr>
+        <tr>
+          <td>Yaw: <span data-bind="text: Yaw"></span></td>
+        </tr>
+      </tbody>
+    </table>
+  </script>
+
+  <script id="template-quality" type="text/x-kendo-template">
+    <table class="table table-bordered table-sm table-striped table-responsive" role="grid" style="padding:0px; margin-bottom:0px">
+      <tbody>
+        <tr>
+          <td>Brightness: <span data-bind="text: Brightness"></span></td>
+        </tr>
+        <tr>
+          <td>Sharpness: <span data-bind="text: Sharpness"></span></td>
+        </tr>
+      </tbody>
+    </table>
+  </script>
+
+  <script id="template-program" type="text/x-kendo-template">
+    <table class="table table-bordered table-sm table-striped table-responsive" role="grid" style="padding:0px; margin-bottom:0px">
+      <tbody>
+        <tr>
+          <td>
+            #= (MovieId) ? "MovieId: " + MovieId : '' # #= (ShowId) ? "ShowId: " + ShowId : '' #
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </script>
+
+  <div id="window">
+    <div class="row" style="width:100%;">
+      <div class="col-sm-6">
+        <img id="WindowImage" />
+        <div id="highlighted-point"></div>
+      </div>
+
+      <div class="col-sm-5">
+        <div id="WindowDetails">
+          <table class="table table-bordered table-sm table-striped table-responsive" role="grid">
+            <tbody>
+              <tr>
+                <td>Id</td>
+                <td data-bind="text: Id"></td>
+              </tr>
+              <tr>
+                <td>Size</td>
+                <td><span data-bind="text: Width"></span> x <span data-bind="text: Height"></span></td>
+              </tr>
+              <tr>
+                <td>Attribution</td>
+                <td data-bind="text: Attribution"></td>
+              </tr>
+              <tr>
+                <td>BoundingBox</td>
+                <td data-bind="source: FaceDetails.BoundingBox" data-template="template-boundingbox"></td>
+              </tr>
+              <tr>
+                <td>Pose</td>
+                <td data-bind="source: FaceDetails.Pose" data-template="template-pose"></td>
+              </tr>
+              <tr>
+                <td>Quality</td>
+                <td data-bind="source: FaceDetails.Quality" data-template="template-quality"></td>
+              </tr>
+              <tr>
+                <td>Has Beard</td>
+                <td data-bind="source: FaceDetails.Beard" data-template="template-generic"></td>
+              </tr>
+              <tr>
+                <td>Eye Glasses</td>
+                <td data-bind="source: FaceDetails.Eyeglasses" data-template="template-generic"></td>
+              </tr>
+              <tr>
+                <td>Eyes Open</td>
+                <td data-bind="source: FaceDetails.EyesOpen" data-template="template-generic"></td>
+              </tr>
+              <tr>
+                <td>Gender</td>
+                <td data-bind="source: FaceDetails.Gender" data-template="template-generic"></td>
+              </tr>
+              <tr>
+                <td>Age Range</td>
+                <td data-bind="source: FaceDetails.AgeRange" data-template="template-age-range"></td>
+              </tr>
+              <tr>
+                <td>Emotions</td>
+                <td>
+                  <table class="table table-bordered table-sm table-striped table-responsive" role="grid" style="padding:0px; margin-bottom:0px">
+                    <tbody data-bind="source: FaceDetails.Emotions" data-template="template-emotions"></tbody>
+                  </table>
+                </td>
+              </tr>
+              <tr>
+                <td>Landmarks <span class="small">(click larmark to identify in photograph)</span></td>
+                <td>
+                  <table class="table table-bordered table-sm table-striped table-responsive" role="grid" style="padding:0px; margin-bottom:0px">
+                    <tbody data-bind="source: FaceDetails.Landmarks" data-template="template-landmarks"></tbody>
+                  </table>
+                </td>
+              </tr>
+              <tr>
+                <td>Mouth Open</td>
+                <td data-bind="source: FaceDetails.MouthOpen" data-template="template-generic"></td>
+              </tr>
+              <tr>
+                <td>Mustache</td>
+                <td data-bind="source: FaceDetails.Mustache" data-template="template-generic"></td>
+              </tr>
+              <tr>
+                <td>Smile</td>
+                <td data-bind="source: FaceDetails.Smile" data-template="template-generic"></td>
+              </tr>
+              <tr>
+                <td>Sunglasses</td>
+                <td data-bind="source: FaceDetails.Sunglasses" data-template="template-generic"></td>
+              </tr>
+              <tr>
+                <td>Program</td>
+                <td>
+                  <table class="table table-bordered table-sm table-striped table-responsive" role="grid" style="padding:0px; margin-bottom:0px">
+                    <tr>
+                      <td>MovieId:</td>
+                      <td data-bind="text: MovieId"></td>
+                    </tr>
+                    <tr>
+                      <td>ShowId:</td>
+                      <td data-bind="text: ShowId"></td>
+                    </tr>
+                    <tr>
+                      <td>SeasonId:</td>
+                      <td data-bind="text: SeasonId"></td>
+                    </tr>
+                    <tr>
+                      <td>EpisodeId:</td>
+                      <td data-bind="text: EpisodeId"></td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>
